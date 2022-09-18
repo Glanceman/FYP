@@ -33,7 +33,7 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* CameraBoom;
-
-	UPROPERTY(EditAnywhere)
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UCameraComponent* Camera;
 };
