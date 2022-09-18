@@ -36,7 +36,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UCameraComponent* Camera;
-
-	UPROPERTY(EditAnywhere)
-	bool bEquipWeapon;
 };
