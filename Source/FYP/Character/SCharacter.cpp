@@ -3,6 +3,7 @@
 
 #include "SCharacter.h"
 
+#include "Animation/AnimNode_LinkedAnimLayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -19,7 +20,7 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw=false;
 	CameraBoom->bUsePawnControlRotation=true;
 	GetCharacterMovement()->bOrientRotationToMovement=true;
-
+	
 
 }
 
@@ -27,7 +28,11 @@ ASCharacter::ASCharacter()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Weapon = GetWorld()->SpawnActor<ASKatanaBase>(WeaponClass);
+	Weapon->Katana->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("DEF-Katana_Target"));
+	Weapon->Scabbard->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("DEF-Scabbard_Target"));
+	//Weapon->Katana->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Weapon->SetOwner(this);
 }
 
 // Called every frame
@@ -60,7 +65,7 @@ void ASCharacter::MoveRight(float val)
 	FRotator ControlRot=GetControlRotation();
 	ControlRot.Pitch=0;
 	ControlRot.Roll=0;
-
+	
 	FVector ControlRightVec=UKismetMathLibrary::GetRightVector(ControlRot);
 	AddMovementInput(ControlRightVec,val);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
+#include "FYP/Actor/SKatanaBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SCharacter.generated.h"
@@ -33,7 +34,12 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* CameraBoom;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASKatanaBase> WeaponClass;
+
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UCameraComponent* Camera;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	ASKatanaBase* Weapon;
 };
