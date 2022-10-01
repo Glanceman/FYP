@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "./SWeaponBase.h"
+#include "SBladeBase.h"
 #include "SKatanaBase.generated.h"
 
 /**
@@ -15,16 +16,21 @@ class FYP_API ASKatanaBase : public ASWeaponBase
 	GENERATED_BODY()
 public:
 	ASKatanaBase();
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<ASBladeBase> GetProjectileClass();
 
-
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Katana;
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	UStaticMeshComponent* Scabbard;
-	protected:
+	
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASBladeBase> ProjectileBladeClass;
 };

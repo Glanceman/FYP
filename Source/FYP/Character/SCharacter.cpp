@@ -33,12 +33,16 @@ void ASCharacter::BeginPlay()
 	Weapon->Scabbard->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("DEF-Scabbard_Target"));
 	//Weapon->Katana->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Weapon->SetOwner(this);
+	GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
+
+	
 }
 
 // Called every frame
 void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	DashTimeLine.TickTimeline(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -51,6 +55,11 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse",this,&APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ACharacter::Jump);
+	PlayerInputComponent->BindAction("EquipWeapon",EInputEvent::IE_Pressed,this,&ASCharacter::SwapAnimationClass);
+	
+	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashAndRun);
+	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::RecoverFromDash);
+	
 }
 
 void ASCharacter::MoveForward(float val)
@@ -60,6 +69,7 @@ void ASCharacter::MoveForward(float val)
 	ControlRot.Roll=0;
 	AddMovementInput(ControlRot.Vector(),val);
 }
+
 void ASCharacter::MoveRight(float val)
 {
 	FRotator ControlRot=GetControlRotation();
@@ -69,3 +79,93 @@ void ASCharacter::MoveRight(float val)
 	FVector ControlRightVec=UKismetMathLibrary::GetRightVector(ControlRot);
 	AddMovementInput(ControlRightVec,val);
 }
+
+ASKatanaBase* ASCharacter::GetWeapon() const
+{
+	return Weapon;
+}
+
+void ASCharacter::SwapAnimationClass()
+{
+	bIsAttachWeapon=!bIsAttachWeapon;
+	if(bIsAttachWeapon)
+	{
+		PlayAnimMontage(EquipWeaponMontage);
+		GetMesh()->LinkAnimClassLayers(WeaponAnimClass);
+	}else
+	{
+		PlayAnimMontage(DetachWeaponMontage);
+		GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
+	}
+}
+
+bool ASCharacter::GetIsDash() const
+{
+	return bIsDash;
+}
+
+bool ASCharacter::GetIsSprint() const
+{
+	return bIsSprint;
+}
+
+void ASCharacter::DashAndRun()
+{
+
+	if(DashCurveFloat==nullptr)
+	{
+		return;
+	}
+	
+	bDashKeyHold=true;
+	GetCharacterMovement()->MaxWalkSpeed=3000;
+	GetCharacterMovement()->MaxAcceleration=3000;
+	bIsDash=true;
+	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
+	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
+	
+	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
+	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
+	DashTimeLine.SetTimelineLength(0.8f);
+	DashTimeLine.SetLooping(false);
+
+	DashTimeLine.PlayFromStart();
+}
+
+void ASCharacter::UpdateDash()
+{
+	UE_LOG(LogTemp,Warning,TEXT("Update Called"));
+	AddMovementInput(GetActorForwardVector());
+	const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
+	const float FOV = FMath::Lerp(90,100,CurveFloat);
+	Camera->SetFieldOfView(FOV);
+}
+
+void ASCharacter::Run()
+{
+	UE_LOG(LogTemp,Warning,TEXT("Finish Called"));
+	const FVector CharacterCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
+	if(bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
+	{
+		GetCharacterMovement()->MaxWalkSpeed=1000;
+		GetCharacterMovement()->MaxAcceleration=1000;
+		bIsSprint=true;
+		bIsDash=false;
+	}else
+	{
+		bIsSprint=false;
+		bIsDash=false;
+		GetCharacterMovement()->MaxWalkSpeed=500;
+	}
+}
+
+void ASCharacter::RecoverFromDash()
+{
+	bDashKeyHold=false;
+	if(bIsSprint)
+	{
+		bIsSprint=false;
+		GetCharacterMovement()->MaxWalkSpeed=500;
+	}
+}
+

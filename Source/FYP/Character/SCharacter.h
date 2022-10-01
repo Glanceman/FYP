@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TimelineComponent.h"
+
 #include "FYP/Actor/SKatanaBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -29,17 +31,54 @@ public:
 	void MoveRight(float val);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void MoveForward(float val);
 
+	//functions
+	void MoveForward(float val);
+	void DashAndRun();
+	UFUNCTION(BlueprintCallable)
+	ASKatanaBase* GetWeapon() const;
+	void SwapAnimationClass();
+	UFUNCTION(BlueprintCallable)
+	bool GetIsDash() const;
+	UFUNCTION(BlueprintCallable)
+	bool GetIsSprint()const;
 private:
+	//functions
+	UFUNCTION()
+	void UpdateDash();
+	UFUNCTION()
+	void Run();
+	void RecoverFromDash();
+	//variable
+	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
+	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASKatanaBase> WeaponClass;
-
-public:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere)
+	ASKatanaBase* Weapon=nullptr;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	UCameraComponent* Camera;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	ASKatanaBase* Weapon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true))
+	bool bIsAttachWeapon =false;
+	UPROPERTY(EditAnywhere,Category="Anim Montage")
+	UAnimMontage* EquipWeaponMontage;
+	UPROPERTY(EditAnywhere,Category="Anim Montage")
+	UAnimMontage* DetachWeaponMontage;
+	UPROPERTY(EditAnywhere,Category="Anim")
+	TSubclassOf<UAnimInstance> WeaponAnimClass;
+	UPROPERTY(EditAnywhere,Category="Anim")
+	TSubclassOf<UAnimInstance> DefaultAnimClass;
+	UPROPERTY()
+	FTimeline DashTimeLine;
+	UPROPERTY(EditAnywhere,Category="Time Line Setting")
+	UCurveFloat* DashCurveFloat;
+	UPROPERTY()
+	bool bIsDash=false;
+	UPROPERTY()
+	bool bIsSprint=false;
+	UPROPERTY()
+	bool bDashKeyHold=false;
+
 };
