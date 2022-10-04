@@ -42,6 +42,12 @@ public:
 	bool GetIsDash() const;
 	UFUNCTION(BlueprintCallable)
 	bool GetIsSprint()const;
+
+	UFUNCTION(BlueprintCallable)
+	void AttachWeapon();
+	UFUNCTION(BlueprintCallable)
+	void DetachWeapon();
+
 private:
 	//functions
 	UFUNCTION()
@@ -50,35 +56,51 @@ private:
 	void Run();
 	void RecoverFromDash();
 	//variable
-	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
-	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
+
 	UPROPERTY(EditAnywhere)
 	USpringArmComponent* CameraBoom;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASKatanaBase> WeaponClass;
+	
 	UPROPERTY(EditAnywhere)
 	ASKatanaBase* Weapon=nullptr;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
 	UCameraComponent* Camera;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true))
 	bool bIsAttachWeapon =false;
+	
 	UPROPERTY(EditAnywhere,Category="Anim Montage")
 	UAnimMontage* EquipWeaponMontage;
+	
 	UPROPERTY(EditAnywhere,Category="Anim Montage")
 	UAnimMontage* DetachWeaponMontage;
+	
 	UPROPERTY(EditAnywhere,Category="Anim")
 	TSubclassOf<UAnimInstance> WeaponAnimClass;
+	
 	UPROPERTY(EditAnywhere,Category="Anim")
 	TSubclassOf<UAnimInstance> DefaultAnimClass;
+
 	UPROPERTY()
 	FTimeline DashTimeLine;
+	
 	UPROPERTY(EditAnywhere,Category="Time Line Setting")
 	UCurveFloat* DashCurveFloat;
+	
 	UPROPERTY()
 	bool bIsDash=false;
+	
 	UPROPERTY()
 	bool bIsSprint=false;
+	
 	UPROPERTY()
 	bool bDashKeyHold=false;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
+	float WalkMaxSpeed=500;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
+	float RunMaxSpeed=1000;
 };

@@ -91,11 +91,10 @@ void ASCharacter::SwapAnimationClass()
 	if(bIsAttachWeapon)
 	{
 		PlayAnimMontage(EquipWeaponMontage);
-		GetMesh()->LinkAnimClassLayers(WeaponAnimClass);
+
 	}else
 	{
 		PlayAnimMontage(DetachWeaponMontage);
-		GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
 	}
 }
 
@@ -107,6 +106,20 @@ bool ASCharacter::GetIsDash() const
 bool ASCharacter::GetIsSprint() const
 {
 	return bIsSprint;
+}
+
+void ASCharacter::AttachWeapon()
+{
+	if(Weapon==nullptr){return;}
+	Weapon->Katana->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,"DEF-weapon_R");
+	GetMesh()->LinkAnimClassLayers(WeaponAnimClass);
+}
+
+void ASCharacter::DetachWeapon()
+{
+	if(Weapon==nullptr){return;}
+	Weapon->Katana->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,"DEF-Katana_Target");
+	GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
 }
 
 void ASCharacter::DashAndRun()
@@ -121,12 +134,13 @@ void ASCharacter::DashAndRun()
 	GetCharacterMovement()->MaxWalkSpeed=3000;
 	GetCharacterMovement()->MaxAcceleration=3000;
 	bIsDash=true;
+	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
 	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
 	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
-	
+	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
 	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
 	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
-	DashTimeLine.SetTimelineLength(0.8f);
+	DashTimeLine.SetTimelineLength(0.81f);
 	DashTimeLine.SetLooping(false);
 
 	DashTimeLine.PlayFromStart();
@@ -135,28 +149,32 @@ void ASCharacter::DashAndRun()
 void ASCharacter::UpdateDash()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Update Called"));
-	AddMovementInput(GetActorForwardVector());
-	const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
-	const float FOV = FMath::Lerp(90,100,CurveFloat);
-	Camera->SetFieldOfView(FOV);
+	if(DashTimeLine.GetPlaybackPosition()!=0.8f)
+	{
+		AddMovementInput(GetActorForwardVector());
+		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
+		const float FOV = FMath::Lerp(90,100,CurveFloat);
+		Camera->SetFieldOfView(FOV);	
+	}
 }
 
 void ASCharacter::Run()
 {
-	UE_LOG(LogTemp,Warning,TEXT("Finish Called"));
+	bIsDash=false;
 	const FVector CharacterCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
 	if(bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
 	{
-		GetCharacterMovement()->MaxWalkSpeed=1000;
-		GetCharacterMovement()->MaxAcceleration=1000;
+		GetCharacterMovement()->MaxWalkSpeed=RunMaxSpeed;
 		bIsSprint=true;
-		bIsDash=false;
+		
 	}else
 	{
 		bIsSprint=false;
-		bIsDash=false;
-		GetCharacterMovement()->MaxWalkSpeed=500;
+		GetCharacterMovement()->MaxWalkSpeed=WalkMaxSpeed;
+			
 	}
+	GetCharacterMovement()->MaxAcceleration=1000;;
+	UE_LOG(LogTemp,Warning,TEXT("Finish Called %f %b"),GetCharacterMovement()->GetCurrentAcceleration().Length(),bIsDash);
 }
 
 void ASCharacter::RecoverFromDash()
@@ -165,7 +183,7 @@ void ASCharacter::RecoverFromDash()
 	if(bIsSprint)
 	{
 		bIsSprint=false;
-		GetCharacterMovement()->MaxWalkSpeed=500;
+		GetCharacterMovement()->MaxWalkSpeed=WalkMaxSpeed;
 	}
 }
 
