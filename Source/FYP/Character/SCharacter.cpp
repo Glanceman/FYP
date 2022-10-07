@@ -35,7 +35,15 @@ void ASCharacter::BeginPlay()
 	Weapon->SetOwner(this);
 	GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
 
-	
+	//set TimeLine
+	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
+	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
+	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
+	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
+	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
+	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
+	DashTimeLine.SetTimelineLength(0.81f);
+	DashTimeLine.SetLooping(false);
 }
 
 // Called every frame
@@ -113,6 +121,7 @@ void ASCharacter::AttachWeapon()
 	if(Weapon==nullptr){return;}
 	Weapon->Katana->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,"DEF-weapon_R");
 	GetMesh()->LinkAnimClassLayers(WeaponAnimClass);
+	bIsAttachWeapon=true;
 }
 
 void ASCharacter::DetachWeapon()
@@ -120,6 +129,7 @@ void ASCharacter::DetachWeapon()
 	if(Weapon==nullptr){return;}
 	Weapon->Katana->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform,"DEF-Katana_Target");
 	GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
+	bIsAttachWeapon=false;
 }
 
 void ASCharacter::DashAndRun()
@@ -134,15 +144,7 @@ void ASCharacter::DashAndRun()
 	GetCharacterMovement()->MaxWalkSpeed=3000;
 	GetCharacterMovement()->MaxAcceleration=3000;
 	bIsDash=true;
-	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
-	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
-	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
-	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
-	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
-	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
-	DashTimeLine.SetTimelineLength(0.81f);
-	DashTimeLine.SetLooping(false);
-
+	
 	DashTimeLine.PlayFromStart();
 }
 
