@@ -19,22 +19,17 @@ class FYP_API ASCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ASCharacter();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void MoveRight(float val);
+	void MoveRightEvent(float val);
+	void JumpEvent();
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//functions
-	void MoveForward(float val);
-	void DashAndRun();
+	void MoveForwardEvent(float val);
+	void DashPressEvent();
 	UFUNCTION(BlueprintCallable)
 	ASKatanaBase* GetWeapon() const;
 	void SwapAnimationClass();
@@ -48,13 +43,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DetachWeapon();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+
+
 private:
 	//functions
 	UFUNCTION()
 	void UpdateDash();
 	UFUNCTION()
 	void Run();
-	void RecoverFromDash();
+	void DashReleaseEvent();
 	//variable
 
 	UPROPERTY(EditAnywhere)
@@ -99,6 +100,8 @@ private:
 	UPROPERTY()
 	bool bDashKeyHold=false;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
+	bool bAllowBasicMovement=true;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
 	float WalkMaxSpeed=500;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")

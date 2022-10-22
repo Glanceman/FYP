@@ -57,35 +57,42 @@ void ASCharacter::Tick(float DeltaTime)
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Move Forward / Backward",this,&ASCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("Move Right / Left",this,&ASCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("Move Forward / Backward",this,&ASCharacter::MoveForwardEvent);
+	PlayerInputComponent->BindAxis("Move Right / Left",this,&ASCharacter::MoveRightEvent);
 	PlayerInputComponent->BindAxis("Turn Right / Left Mouse",this,&APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse",this,&APawn::AddControllerPitchInput);
 
-	PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ASCharacter::JumpEvent);
 	PlayerInputComponent->BindAction("EquipWeapon",EInputEvent::IE_Pressed,this,&ASCharacter::SwapAnimationClass);
 	
-	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashAndRun);
-	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::RecoverFromDash);
+	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashPressEvent);
+	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::DashReleaseEvent);
 	
 }
 
-void ASCharacter::MoveForward(float val)
+void ASCharacter::MoveForwardEvent(float val)
 {
+	if(!bAllowBasicMovement)return;
 	FRotator ControlRot=GetControlRotation();
 	ControlRot.Pitch=0;
 	ControlRot.Roll=0;
 	AddMovementInput(ControlRot.Vector(),val);
 }
 
-void ASCharacter::MoveRight(float val)
+void ASCharacter::MoveRightEvent(float val)
 {
+	if(!bAllowBasicMovement)return;
 	FRotator ControlRot=GetControlRotation();
 	ControlRot.Pitch=0;
 	ControlRot.Roll=0;
-	
-	FVector ControlRightVec=UKismetMathLibrary::GetRightVector(ControlRot);
+
+	const FVector ControlRightVec=UKismetMathLibrary::GetRightVector(ControlRot);
 	AddMovementInput(ControlRightVec,val);
+}
+void ASCharacter::JumpEvent()
+{
+	if(!bAllowBasicMovement)return;
+	Jump();
 }
 
 ASKatanaBase* ASCharacter::GetWeapon() const
@@ -132,7 +139,7 @@ void ASCharacter::DetachWeapon()
 	bIsAttachWeapon=false;
 }
 
-void ASCharacter::DashAndRun()
+void ASCharacter::DashPressEvent()
 {
 
 	if(DashCurveFloat==nullptr)
@@ -150,7 +157,7 @@ void ASCharacter::DashAndRun()
 
 void ASCharacter::UpdateDash()
 {
-	UE_LOG(LogTemp,Warning,TEXT("Update Called"));
+
 	if(DashTimeLine.GetPlaybackPosition()!=0.8f)
 	{
 		AddMovementInput(GetActorForwardVector());
@@ -176,10 +183,10 @@ void ASCharacter::Run()
 			
 	}
 	GetCharacterMovement()->MaxAcceleration=1000;;
-	UE_LOG(LogTemp,Warning,TEXT("Finish Called %f %b"),GetCharacterMovement()->GetCurrentAcceleration().Length(),bIsDash);
+	//UE_LOG(LogTemp,Warning,TEXT("Finish Called %f %b"),GetCharacterMovement()->GetCurrentAcceleration().Length(),bIsDash);
 }
 
-void ASCharacter::RecoverFromDash()
+void ASCharacter::DashReleaseEvent()
 {
 	bDashKeyHold=false;
 	if(bIsSprint)
