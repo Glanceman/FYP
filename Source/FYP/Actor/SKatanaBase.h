@@ -19,9 +19,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TSubclassOf<ASBladeBase> GetProjectileClass();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* Katana;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	// UStaticMeshComponent* Katana;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USkeletalMeshComponent* Katana;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	UStaticMeshComponent* Scabbard;
 	
@@ -33,4 +36,17 @@ private:
 	USceneComponent* Root;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASBladeBase> ProjectileBladeClass;
+	UPROPERTY()
+	TArray<FVector> Prev_TrackingPoints;
+	UPROPERTY()
+	TArray<FVector> Curr_TrackingPoints;
+	UPROPERTY()
+	FTimerHandle TimerHandle;
+
+	
+	UFUNCTION(BlueprintCallable)
+	TArray<FVector> GetTrackingPoints() const;
+	UFUNCTION(BlueprintCallable)
+	void AttackDetectionEvent();
+	
 };

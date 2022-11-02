@@ -13,5 +13,11 @@ UCLASS()
 class FYP_API ASEnemyBaseController : public AAIController
 {
 	GENERATED_BODY()
+public:
+	//virtual void OnPossess(APawn * InPawn) override;
+	virtual void BeginPlay() override;
+private:
+	UPROPERTY(EditAnywhere,Category="Setting")
+	UBehaviorTree* SEnemyBase_BT;
 	
 };
