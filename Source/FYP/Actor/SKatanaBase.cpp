@@ -54,17 +54,40 @@ TArray<FVector> ASKatanaBase::GetTrackingPoints() const
 void ASKatanaBase::AttackDetectionEvent()
 {
 	Prev_TrackingPoints=this->GetTrackingPoints();
-	
+	HitActors.Empty();
+	//set up timer
 	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda([this]()
 	{
 		Curr_TrackingPoints=this->GetTrackingPoints();
 		for(int i=0; i<Prev_TrackingPoints.Num();i++)
 		{
-			TArray<FHitResult> HitResult;
-			GetWorld()->LineTraceMultiByChannel(HitResult,Prev_TrackingPoints[i],Curr_TrackingPoints[i],ECollisionChannel::ECC_Visibility);	
+			FHitResult HitResult;
+			if(GetWorld()->LineTraceSingleByChannel(HitResult,Prev_TrackingPoints[i],Curr_TrackingPoints[i],ECollisionChannel::ECC_Visibility))
+			{
+				if(HitActors.Find(HitResult.GetActor())==nullptr)
+				{
+					if(bDebug)
+					{
+					
+						UE_LOG(LogTemp, Display ,TEXT("Actor Name %s"),*HitResult.GetActor()->GetName());
+					}
+					HitActors.Add(HitResult.GetActor());
+				}
+			};
+			//show debug lines
+			if(bDebug)
+			{
+				DrawDebugLine(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],FColor(255, 0, 0),false, 2, 0,2);
+			}
+			
 		}
 		Prev_TrackingPoints=Curr_TrackingPoints;
 	}),0.01,true);
+}
+
+void ASKatanaBase::StopDetectionEvent()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle);
 }
 
 

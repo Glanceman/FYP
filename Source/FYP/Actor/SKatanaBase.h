@@ -42,11 +42,17 @@ private:
 	TArray<FVector> Curr_TrackingPoints;
 	UPROPERTY()
 	FTimerHandle TimerHandle;
+	UPROPERTY(EditAnywhere,Category="Debug Section")
+	bool bDebug=false;
+	UPROPERTY()
+	TSet<AActor*> HitActors;
 
 	
 	UFUNCTION(BlueprintCallable)
 	TArray<FVector> GetTrackingPoints() const;
 	UFUNCTION(BlueprintCallable)
 	void AttackDetectionEvent();
+	UFUNCTION(BlueprintCallable)
+	void StopDetectionEvent();
 	
 };

@@ -64,7 +64,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASKatanaBase> WeaponClass;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	ASKatanaBase* Weapon=nullptr;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
