@@ -16,43 +16,41 @@ class FYP_API ASKatanaBase : public ASWeaponBase
 	GENERATED_BODY()
 public:
 	ASKatanaBase();
-	UFUNCTION(BlueprintCallable)
-	TSubclassOf<ASBladeBase> GetProjectileClass();
-
+	
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	// UStaticMeshComponent* Katana;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Settings")
 	USkeletalMeshComponent* Katana;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings")
+		UStaticMeshComponent* Scabbard;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	UStaticMeshComponent* Scabbard;
-	
+	UFUNCTION(BlueprintCallable)
+		TSubclassOf<ASBladeBase> GetProjectileClass();
+	UFUNCTION(BlueprintCallable)
+		void AttackDetectionEvent();
+	UFUNCTION(BlueprintCallable)
+		void StopDetectionEvent();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 private:
+	UFUNCTION(BlueprintCallable)
+		TArray<FVector> GetTrackingPoints() const;
 	UPROPERTY(VisibleAnywhere)
-	USceneComponent* Root;
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASBladeBase> ProjectileBladeClass;
+		USceneComponent* Root;
+	UPROPERTY(EditAnywhere,Category="Settings")
+		TSubclassOf<ASBladeBase> ProjectileBladeClass;
 	UPROPERTY()
-	TArray<FVector> Prev_TrackingPoints;
+		TArray<FVector> Prev_TrackingPoints;
 	UPROPERTY()
-	TArray<FVector> Curr_TrackingPoints;
+		TArray<FVector> Curr_TrackingPoints;
 	UPROPERTY()
-	FTimerHandle TimerHandle;
+		FTimerHandle TimerHandle;
 	UPROPERTY(EditAnywhere,Category="Debug Section")
-	bool bDebug=false;
+		bool bDebug=false;
 	UPROPERTY()
-	TSet<AActor*> HitActors;
-
+		TSet<AActor*> HitActors;
 	
-	UFUNCTION(BlueprintCallable)
-	TArray<FVector> GetTrackingPoints() const;
-	UFUNCTION(BlueprintCallable)
-	void AttackDetectionEvent();
-	UFUNCTION(BlueprintCallable)
-	void StopDetectionEvent();
 	
 };

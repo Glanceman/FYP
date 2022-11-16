@@ -20,6 +20,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere,Category="Setting")
+		float DamageValue=1;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

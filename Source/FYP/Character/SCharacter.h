@@ -30,18 +30,17 @@ public:
 	//functions
 	void MoveForwardEvent(float val);
 	void DashPressEvent();
-	UFUNCTION(BlueprintCallable)
-	ASKatanaBase* GetWeapon() const;
 	void SwapAnimationClass();
 	UFUNCTION(BlueprintCallable)
-	bool GetIsDash() const;
+		ASKatanaBase* GetWeapon() const;
 	UFUNCTION(BlueprintCallable)
-	bool GetIsSprint()const;
-
+		bool GetIsDash() const;
 	UFUNCTION(BlueprintCallable)
-	void AttachWeapon();
+		bool GetIsSprint()const;
 	UFUNCTION(BlueprintCallable)
-	void DetachWeapon();
+		void AttachWeapon();
+	UFUNCTION(BlueprintCallable)
+		void DetachWeapon();
 
 protected:
 	// Called when the game starts or when spawned
@@ -52,58 +51,57 @@ protected:
 private:
 	//functions
 	UFUNCTION()
-	void UpdateDash();
+		void UpdateDash();
 	UFUNCTION()
-	void Run();
-	void DashReleaseEvent();
+		void Run();
+		void DashReleaseEvent();
 	//variable
 
 	UPROPERTY(EditAnywhere)
-	USpringArmComponent* CameraBoom;
+		USpringArmComponent* CameraBoom;
 	
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASKatanaBase> WeaponClass;
+		TSubclassOf<ASKatanaBase> WeaponClass;
 	
 	UPROPERTY()
-	ASKatanaBase* Weapon=nullptr;
+		ASKatanaBase* Weapon=nullptr;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true))
-	UCameraComponent* Camera;
+		UCameraComponent* Camera;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true))
-	bool bIsAttachWeapon =false;
+	UPROPERTY(EditAnywhere,Category="Animation Setting")
+		UAnimMontage* EquipWeaponMontage;
 	
-	UPROPERTY(EditAnywhere,Category="Anim Montage")
-	UAnimMontage* EquipWeaponMontage;
+	UPROPERTY(EditAnywhere,Category="Animation Setting")
+		UAnimMontage* DetachWeaponMontage;
 	
-	UPROPERTY(EditAnywhere,Category="Anim Montage")
-	UAnimMontage* DetachWeaponMontage;
+	UPROPERTY(EditAnywhere,Category="Animation Setting")
+		TSubclassOf<UAnimInstance> WeaponAnimClass;
 	
-	UPROPERTY(EditAnywhere,Category="Anim")
-	TSubclassOf<UAnimInstance> WeaponAnimClass;
-	
-	UPROPERTY(EditAnywhere,Category="Anim")
-	TSubclassOf<UAnimInstance> DefaultAnimClass;
+	UPROPERTY(EditAnywhere,Category="Animation Setting")
+		TSubclassOf<UAnimInstance> DefaultAnimClass;
 
 	UPROPERTY()
-	FTimeline DashTimeLine;
+		FTimeline DashTimeLine;
 	
 	UPROPERTY(EditAnywhere,Category="Time Line Setting")
-	UCurveFloat* DashCurveFloat;
+		UCurveFloat* DashCurveFloat;
 	
 	UPROPERTY()
-	bool bIsDash=false;
+		bool bIsDash=false;
 	
 	UPROPERTY()
-	bool bIsSprint=false;
+		bool bIsSprint=false;
 	
 	UPROPERTY()
-	bool bDashKeyHold=false;
+		bool bDashKeyHold=false;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
-	bool bAllowBasicMovement=true;
+		bool bAllowBasicMovement=true;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
-	float WalkMaxSpeed=500;
+		float WalkMaxSpeed=500;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
-	float RunMaxSpeed=1000;
+		float RunMaxSpeed=1000;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
+		bool bIsAttachWeapon =false;
 };
