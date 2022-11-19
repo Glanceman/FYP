@@ -29,5 +29,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UAISenseConfig_Sight* SightConfig;
+
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	float SightRadius=1000;
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	float LoseSightRadius=2000;
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	float PeripheralVisionAngleDegrees=60;
 	
 };
