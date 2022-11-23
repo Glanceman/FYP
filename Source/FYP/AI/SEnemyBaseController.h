@@ -20,6 +20,9 @@ public:
 	void OnPerception(AActor* Actor, FAIStimulus Stimulus);
 	//virtual void OnPossess(APawn * InPawn) override;
 	virtual void BeginPlay() override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 private:
 	UPROPERTY(EditAnywhere,Category="Setting")
 	UBehaviorTree* SEnemyBase_BT;
@@ -36,5 +39,13 @@ private:
 	float LoseSightRadius=2000;
 	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
 	float PeripheralVisionAngleDegrees=60;
-	
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	bool bCheckEnemy=true;
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	bool bCheckNeutral=true;
+	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	bool bCheckFriend=true;
+
+	FGenericTeamId TeamId;
+
 };

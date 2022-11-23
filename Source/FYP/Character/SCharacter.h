@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TimelineComponent.h"
-
+#include "GenericTeamAgentInterface.h"
+#include "SCharacterBase.h"
 #include "FYP/Actor/SKatanaBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SCharacter.generated.h"
 
 UCLASS()
-class FYP_API ASCharacter : public ACharacter
+class FYP_API ASCharacter : public ASCharacterBase
 {
 	GENERATED_BODY()
 
@@ -42,11 +43,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DetachWeapon();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
 
 private:
 	//functions
@@ -104,4 +104,5 @@ private:
 		float RunMaxSpeed=1000;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
 		bool bIsAttachWeapon =false;
+	
 };
