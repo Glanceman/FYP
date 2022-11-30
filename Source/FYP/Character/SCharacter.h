@@ -104,5 +104,7 @@ private:
 		float RunMaxSpeed=1000;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
 		bool bIsAttachWeapon =false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
+		float DashTimeLength =0.5f;
 	
 };

@@ -4,6 +4,8 @@
 #include "SCharacter.h"
 
 #include "Animation/AnimNode_LinkedAnimLayer.h"
+#include "Components/InputComponent.h"
+#include "Curves/CurveFloat.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -42,7 +44,7 @@ void ASCharacter::BeginPlay()
 	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
 	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
 	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
-	DashTimeLine.SetTimelineLength(0.81f);
+	DashTimeLine.SetTimelineLength(DashTimeLength+0.01f);
 	DashTimeLine.SetLooping(false);
 }
 
@@ -67,7 +69,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashPressEvent);
 	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::DashReleaseEvent);
-	
+
 }
 
 void ASCharacter::MoveForwardEvent(float val)
@@ -158,7 +160,7 @@ void ASCharacter::DashPressEvent()
 void ASCharacter::UpdateDash()
 {
 
-	if(DashTimeLine.GetPlaybackPosition()!=0.8f)
+	if(DashTimeLine.GetPlaybackPosition()<=DashTimeLength)
 	{
 		AddMovementInput(GetActorForwardVector());
 		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());

@@ -20,9 +20,9 @@ public:
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	// UStaticMeshComponent* Katana;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Settings")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Setting")
 	USkeletalMeshComponent* Katana;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Setting")
 		UStaticMeshComponent* Scabbard;
 	
 	UFUNCTION(BlueprintCallable)
@@ -39,7 +39,7 @@ private:
 		TArray<FVector> GetTrackingPoints() const;
 	UPROPERTY(VisibleAnywhere)
 		USceneComponent* Root;
-	UPROPERTY(EditAnywhere,Category="Settings")
+	UPROPERTY(EditAnywhere,Category="Setting")
 		TSubclassOf<ASBladeBase> ProjectileBladeClass;
 	UPROPERTY()
 		TArray<FVector> Prev_TrackingPoints;

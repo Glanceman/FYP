@@ -20,13 +20,13 @@ void ASEnemyBaseController::OnPerception(AActor* Actor, FAIStimulus Stimulus)
 	if(Stimulus.WasSuccessfullySensed())
 	{
 		Blackboard->SetValueAsObject(TEXT("TargetActor"),Actor);
-		Blackboard->SetValueAsVector(TEXT("InvestigateLocation"),Actor->GetActorLocation());
 		UE_LOG(LogTemp,Warning,TEXT("Sense coming"));
 	}else
 	{
 		Blackboard->ClearValue(TEXT("TargetActor"));
 		UE_LOG(LogTemp,Warning,TEXT("Sense Leaving"));
 	}
+	Blackboard->SetValueAsVector(TEXT("InvestigateLocation"),Actor->GetActorLocation());
 }
 
 void ASEnemyBaseController::BeginPlay()

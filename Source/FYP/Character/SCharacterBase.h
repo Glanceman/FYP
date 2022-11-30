@@ -15,12 +15,14 @@ class FYP_API ASCharacterBase : public ACharacter, public IGenericTeamAgentInter
 public:
 	// Sets default values for this character's properties
 	ASCharacterBase();
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
-	FGenericTeamId ClassId=0;
-	virtual FGenericTeamId GetGenericTeamId() const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadWrite)
+	float HP = 100;
+	
 
 public:	
 	// Called every frame
@@ -28,5 +30,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentHP() const;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
+	UPROPERTY(EditAnywhere,Category="Setting")
+	float MaxHp=100;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
+	FGenericTeamId ClassId=0;
 };

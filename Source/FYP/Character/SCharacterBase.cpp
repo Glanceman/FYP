@@ -11,15 +11,13 @@ ASCharacterBase::ASCharacterBase()
 
 }
 
-FGenericTeamId ASCharacterBase::GetGenericTeamId() const
-{
-	return ClassId;
-}
+
 
 // Called when the game starts or when spawned
 void ASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	HP= MaxHp;
 	
 }
 
@@ -35,5 +33,15 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+FGenericTeamId ASCharacterBase::GetGenericTeamId() const
+{
+	return ClassId;
+}
+
+float ASCharacterBase::GetCurrentHP() const
+{
+	return HP;
 }
 
