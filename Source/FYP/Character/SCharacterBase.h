@@ -33,10 +33,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHP() const;
+
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 	UPROPERTY(EditAnywhere,Category="Setting")
 	float MaxHp=100;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
 	FGenericTeamId ClassId=0;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
+	float BasicDamageValue = 1;
 };

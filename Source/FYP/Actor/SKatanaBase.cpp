@@ -6,6 +6,9 @@
 #include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/DamageType.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ASKatanaBase::ASKatanaBase()
 {
@@ -59,18 +62,24 @@ void ASKatanaBase::AttackDetectionEvent()
 	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda([this]()
 	{
 		Curr_TrackingPoints=this->GetTrackingPoints();
+		TArray<AActor*>IgnoredActor;
+		IgnoredActor.Add(GetOwner());
 		for(int i=0; i<Prev_TrackingPoints.Num();i++)
 		{
 			FHitResult HitResult;
-			if(GetWorld()->LineTraceSingleByChannel(HitResult,Prev_TrackingPoints[i],Curr_TrackingPoints[i],ECollisionChannel::ECC_Visibility))
+			if(UKismetSystemLibrary::SphereTraceSingle(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],10.0f,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResult,true))
+			//if(GetWorld()->LineTraceSingleByChannel(HitResult,Prev_TrackingPoints[i],Curr_TrackingPoints[i],ECollisionChannel::ECC_Visibility))
 			{
 				if(HitActors.Find(HitResult.GetActor())==nullptr)
 				{
-					if(bDebug)
-					{
-					
-						UE_LOG(LogTemp, Display ,TEXT("Actor Name %s"),*HitResult.GetActor()->GetName());
-					}
+					const AActor* HitActor = HitResult.GetActor();
+
+					// if(bDebug)
+					// {
+					//
+					// 	UE_LOG(LogTemp, Display ,TEXT("Actor Name %s"),*HitResult.GetActor()->GetName());
+					// }
+					UGameplayStatics::ApplyDamage(HitResult.GetActor(),DamageValue,HitActor->GetInstigatorController(),this,UDamageType::StaticClass());
 					HitActors.Add(HitResult.GetActor());
 				}
 			};

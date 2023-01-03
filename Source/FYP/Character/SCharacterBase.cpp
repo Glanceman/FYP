@@ -45,3 +45,5 @@ float ASCharacterBase::GetCurrentHP() const
 	return HP;
 }
 
+
+

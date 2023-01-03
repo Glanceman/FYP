@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "SCharacterBase.h"
+#include "Animation/AnimInstance.h"
 #include "FYP/Actor/SKatanaBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -47,7 +48,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	//virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 private:
 	//functions
 	UFUNCTION()
