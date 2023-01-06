@@ -2,22 +2,22 @@
 
 
 #include "./SCharacterBase.h"
+#include "FYP/Component/SAttributeComponent.h"
 
 // Sets default values
 ASCharacterBase::ASCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>(TEXT("Attribute Component"));
 }
-
 
 
 // Called when the game starts or when spawned
 void ASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	HP= MaxHp;
+
 	
 }
 
@@ -40,10 +40,6 @@ FGenericTeamId ASCharacterBase::GetGenericTeamId() const
 	return ClassId;
 }
 
-float ASCharacterBase::GetCurrentHP() const
-{
-	return HP;
-}
 
 
 

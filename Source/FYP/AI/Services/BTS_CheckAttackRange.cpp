@@ -12,7 +12,7 @@ void UBTS_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	UBlackboardComponent* BlackboardComponent=OwnerComp.GetBlackboardComponent();
 	if(ensure(BlackboardComponent))
 	{
-		AActor* TargetActor=static_cast<AActor*>(BlackboardComponent->GetValueAsObject(TargetActorKey.SelectedKeyName));
+		AActor* TargetActor=Cast<AActor>(BlackboardComponent->GetValueAsObject(TargetActorKey.SelectedKeyName));
 		if(TargetActor)
 		{
 			const AAIController* AIController = OwnerComp.GetAIOwner();
@@ -21,9 +21,8 @@ void UBTS_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 				const APawn* Pawn = AIController->GetPawn();
 				if(ensure(Pawn))
 				{
-					bool bWithinRange=false;
 					const float Distance = FVector::Dist(TargetActor->GetActorLocation(),Pawn->GetActorLocation());
-					bWithinRange= Distance<=AttackRange;
+					const bool bWithinRange= Distance <= AttackRange? true : false ;
 					BlackboardComponent->SetValueAsBool(bAttackRangeKey.SelectedKeyName,bWithinRange);
 				}
 			}

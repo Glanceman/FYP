@@ -8,11 +8,11 @@
 #include "GenericTeamAgentInterface.h"
 #include "SCharacterBase.h"
 #include "Animation/AnimInstance.h"
-#include "FYP/Actor/SKatanaBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SCharacter.generated.h"
 
+class ASKatanaBase;
 UCLASS()
 class FYP_API ASCharacter : public ASCharacterBase
 {
@@ -56,8 +56,9 @@ private:
 	UFUNCTION()
 		void Run();
 		void DashReleaseEvent();
-	//variable
 
+
+	//variables
 	UPROPERTY(EditAnywhere)
 		USpringArmComponent* CameraBoom;
 	

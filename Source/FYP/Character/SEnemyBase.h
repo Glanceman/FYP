@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "SCharacterBase.h"
+#include "FYP/Interface/SAttackInterface.h"
 #include "GameFramework/Character.h"
 #include "SEnemyBase.generated.h"
 
 UCLASS()
-class FYP_API ASEnemyBase : public ASCharacterBase
+class FYP_API ASEnemyBase : public ASCharacterBase, public ISAttackInterface
 {
 	GENERATED_BODY()
 
@@ -27,4 +28,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	bool CheckMontageIsPlaying(UAnimMontage* Montage) const;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
+	UAnimMontage* AM_BasicAttack=nullptr;
 };

@@ -32,3 +32,15 @@ void ASEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+bool ASEnemyBase::CheckMontageIsPlaying(UAnimMontage* Montage) const
+{
+	const UAnimInstance* AnimInstance=GetMesh()->GetAnimInstance();
+	if(!AnimInstance) return false;
+
+	const bool result = AnimInstance->Montage_IsPlaying(Montage);
+	return result;
+}
+
+
+
+

@@ -2,7 +2,7 @@
 
 
 #include "SCharacter.h"
-
+#include "FYP/Actor/SKatanaBase.h"
 #include "Animation/AnimNode_LinkedAnimLayer.h"
 #include "Components/InputComponent.h"
 #include "Curves/CurveFloat.h"

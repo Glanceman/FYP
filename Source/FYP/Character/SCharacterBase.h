@@ -7,6 +7,8 @@
 #include "GenericTeamAgentInterface.h"
 #include "SCharacterBase.generated.h"
 
+class USAttributeComponent;
+
 UCLASS()
 class FYP_API ASCharacterBase : public ACharacter, public IGenericTeamAgentInterface
 {
@@ -20,8 +22,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadWrite)
-	float HP = 100;
+
 	
 
 public:	
@@ -31,13 +32,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	UFUNCTION(BlueprintCallable)
-	float GetCurrentHP() const;
+
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
-	UPROPERTY(EditAnywhere,Category="Setting")
-	float MaxHp=100;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly);
+	USAttributeComponent* AttributeComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
 	FGenericTeamId ClassId=0;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")

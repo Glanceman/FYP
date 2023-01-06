@@ -68,27 +68,14 @@ void ASKatanaBase::AttackDetectionEvent()
 		{
 			FHitResult HitResult;
 			if(UKismetSystemLibrary::SphereTraceSingle(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],10.0f,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResult,true))
-			//if(GetWorld()->LineTraceSingleByChannel(HitResult,Prev_TrackingPoints[i],Curr_TrackingPoints[i],ECollisionChannel::ECC_Visibility))
 			{
 				if(HitActors.Find(HitResult.GetActor())==nullptr)
 				{
 					const AActor* HitActor = HitResult.GetActor();
-
-					// if(bDebug)
-					// {
-					//
-					// 	UE_LOG(LogTemp, Display ,TEXT("Actor Name %s"),*HitResult.GetActor()->GetName());
-					// }
 					UGameplayStatics::ApplyDamage(HitResult.GetActor(),DamageValue,HitActor->GetInstigatorController(),this,UDamageType::StaticClass());
 					HitActors.Add(HitResult.GetActor());
 				}
 			};
-			//show debug lines
-			if(bDebug)
-			{
-				DrawDebugLine(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],FColor(255, 0, 0),false, 2, 0,2);
-			}
-			
 		}
 		Prev_TrackingPoints=Curr_TrackingPoints;
 	}),0.01,true);
