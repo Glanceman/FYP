@@ -19,12 +19,12 @@ EBTNodeResult::Type UBTTask_BasicAttack::ExecuteTask(UBehaviorTreeComponent& Own
 		const APawn* Pawn = AIController->GetPawn();
 		if(!ensure(Pawn)) return EBTNodeResult::Failed;
 
-		const ASEnemyBase* Character = Cast<ASEnemyBase>(Pawn);
+		ASEnemyBase* Character = (ASEnemyBase*)Pawn;
 		if(!Character) return EBTNodeResult::Failed;
 		const ISAttackInterface* AttackInterface= Cast<ISAttackInterface>(Pawn);
 		if(ensureMsgf(AttackInterface,TEXT("The AI does not equip attack interface")))
 		{
-			AttackInterface->Execute_BasicAttack(Character);
+			ISAttackInterface::Execute_BasicAttack(Character);
 		}else
 		{
 			return EBTNodeResult::Failed;

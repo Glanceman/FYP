@@ -8,13 +8,14 @@
 #include "GenericTeamAgentInterface.h"
 #include "SCharacterBase.h"
 #include "Animation/AnimInstance.h"
+#include "FYP/Interface/SAttackInterface.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SCharacter.generated.h"
 
 class ASKatanaBase;
 UCLASS()
-class FYP_API ASCharacter : public ASCharacterBase
+class FYP_API ASCharacter : public ASCharacterBase, public ISAttackInterface
 {
 	GENERATED_BODY()
 
@@ -43,12 +44,19 @@ public:
 		void AttachWeapon();
 	UFUNCTION(BlueprintCallable)
 		void DetachWeapon();
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bAttack=false;
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	//virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void BasicAttack_Implementation() override;
+
+
 private:
 	//functions
 	UFUNCTION()
@@ -56,8 +64,10 @@ private:
 	UFUNCTION()
 		void Run();
 		void DashReleaseEvent();
-
-
+	UFUNCTION()
+		void AttackRotate();
+	float StartYaw;;
+	float TargetYaw;
 	//variables
 	UPROPERTY(EditAnywhere)
 		USpringArmComponent* CameraBoom;
@@ -85,9 +95,13 @@ private:
 
 	UPROPERTY()
 		FTimeline DashTimeLine;
+	UPROPERTY()
+		FTimeline AttackOrientationTimeLine;
 	
 	UPROPERTY(EditAnywhere,Category="Time Line Setting")
 		UCurveFloat* DashCurveFloat;
+	UPROPERTY(EditAnywhere,Category="Time Line Setting")
+		UCurveFloat* OrientationSpeedCurveFloat;
 	
 	UPROPERTY()
 		bool bIsDash=false;
@@ -97,6 +111,7 @@ private:
 	
 	UPROPERTY()
 		bool bDashKeyHold=false;
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
 		bool bAllowBasicMovement=true;

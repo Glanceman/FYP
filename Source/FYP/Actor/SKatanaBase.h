@@ -24,7 +24,8 @@ public:
 	USkeletalMeshComponent* Katana;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Setting")
 		UStaticMeshComponent* Scabbard;
-	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		UAnimMontage* AttackMontage;
 	UFUNCTION(BlueprintCallable)
 		TSubclassOf<ASBladeBase> GetProjectileClass();
 	UFUNCTION(BlueprintCallable)
@@ -34,6 +35,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 private:
 	UFUNCTION(BlueprintCallable)
 		TArray<FVector> GetTrackingPoints() const;

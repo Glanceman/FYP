@@ -3,11 +3,15 @@
 
 #include "SCharacter.h"
 #include "FYP/Actor/SKatanaBase.h"
-#include "Animation/AnimNode_LinkedAnimLayer.h"
+
 #include "Components/InputComponent.h"
 #include "Curves/CurveFloat.h"
+#include "FYP/Animation/SAnimCharacterBase.h"
+#include "FYP/Interface/PlayMontageInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Controller.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 // Sets default values
@@ -37,15 +41,56 @@ void ASCharacter::BeginPlay()
 	Weapon->SetOwner(this);
 	GetMesh()->LinkAnimClassLayers(DefaultAnimClass);
 
-	//set TimeLine
-	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
-	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
-	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
-	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
-	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
-	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
-	DashTimeLine.SetTimelineLength(DashTimeLength+0.01f);
-	DashTimeLine.SetLooping(false);
+
+
+}
+
+void ASCharacter::BasicAttack_Implementation() 
+{
+	ISAttackInterface::BasicAttack_Implementation();
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	const FVector CameraWorldLocation = Camera->GetComponentLocation();
+	const FVector CameraForwardVector = Camera->GetForwardVector();
+	TArray<AActor*>IgnoredActor;
+	IgnoredActor.Add(GetController()->GetPawn());
+	TArray<FHitResult> HitResults;
+	UKismetSystemLibrary::SphereTraceMulti(GetWorld(),CameraWorldLocation,CameraWorldLocation+(CameraForwardVector*1000),100,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResults,true);
+	StartYaw=Camera->GetComponentRotation().Yaw;
+	TargetYaw=Camera->GetComponentRotation().Yaw;
+	for(int i=0; i<HitResults.Num();i++)
+	{
+		AActor* HitActor= HitResults[i].GetActor();
+		if(Cast<ASCharacterBase>(HitActor))
+		{
+			DrawDebugSphere(GetWorld(),HitActor->GetActorLocation(),80.0f,10,FColor::Blue,true, -1, 0, 1);
+			FRotator Rotation=UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),HitActor->GetActorLocation());
+			TargetYaw=Rotation.Yaw;
+			break;
+		}
+	}
+
+	if(Cast<IPlayMontageInterface>(AnimInstance))
+	{
+		IPlayMontageInterface::Execute_StartAttackMontage(AnimInstance,Weapon->AttackMontage);
+		FOnTimelineFloatStatic TimeLineUpdateDelegate;
+		TimeLineUpdateDelegate.BindUFunction(this,TEXT("AttackRotate"));
+		AttackOrientationTimeLine.AddInterpFloat(OrientationSpeedCurveFloat,TimeLineUpdateDelegate);
+		AttackOrientationTimeLine.SetLooping(false);
+		float min, max;
+		OrientationSpeedCurveFloat->GetTimeRange(min,max);
+		float length=max-min;
+		AttackOrientationTimeLine.SetTimelineLength(length);
+		AttackOrientationTimeLine.PlayFromStart();
+	};
+}
+
+void ASCharacter::AttackRotate()
+{
+	float Alpha =OrientationSpeedCurveFloat->GetFloatValue(AttackOrientationTimeLine.GetPlaybackPosition());
+	FRotator Rotator(0,StartYaw,0);
+	FRotator Rotator2(0,TargetYaw,0);
+	FRotator NewRotator=FMath::Lerp(Rotator,Rotator2,Alpha);
+	SetActorRotation(NewRotator);	
 }
 
 // Called every frame
@@ -53,6 +98,7 @@ void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	DashTimeLine.TickTimeline(DeltaTime);
+	AttackOrientationTimeLine.TickTimeline(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -75,6 +121,13 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ASCharacter::MoveForwardEvent(float val)
 {
 	if(!bAllowBasicMovement)return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
+	if(!MontageInterface){return;}
+	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
+	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
+	
 	FRotator ControlRot=GetControlRotation();
 	ControlRot.Pitch=0;
 	ControlRot.Roll=0;
@@ -84,6 +137,13 @@ void ASCharacter::MoveForwardEvent(float val)
 void ASCharacter::MoveRightEvent(float val)
 {
 	if(!bAllowBasicMovement)return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
+	if(!MontageInterface){return;}
+	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
+	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
+	
 	FRotator ControlRot=GetControlRotation();
 	ControlRot.Pitch=0;
 	ControlRot.Roll=0;
@@ -94,6 +154,13 @@ void ASCharacter::MoveRightEvent(float val)
 void ASCharacter::JumpEvent()
 {
 	if(!bAllowBasicMovement)return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
+	if(!MontageInterface){return;}
+	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
+	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
+	
 	Jump();
 }
 
@@ -150,17 +217,38 @@ void ASCharacter::DashPressEvent()
 	}
 	
 	bDashKeyHold=true;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
+	if(!MontageInterface){return;}
+	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
+	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
+	
 	GetCharacterMovement()->MaxWalkSpeed=3000;
 	GetCharacterMovement()->MaxAcceleration=3000;
 	bIsDash=true;
+	//set TimeLine
+	float min, max;
+	DashCurveFloat->GetTimeRange(min,max);
+	float length = max - min; 
+	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
+	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
+	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
+	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
+	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
+	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
+
+	DashTimeLine.SetTimelineLength(length+0.01f);
+	DashTimeLine.SetLooping(false);
 	
 	DashTimeLine.PlayFromStart();
 }
 
 void ASCharacter::UpdateDash()
 {
-
-	if(DashTimeLine.GetPlaybackPosition()<=DashTimeLength)
+	float min, max;
+	DashCurveFloat->GetTimeRange(min,max);
+	if(DashTimeLine.GetPlaybackPosition()<=max)
 	{
 		AddMovementInput(GetActorForwardVector());
 		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
