@@ -6,7 +6,6 @@
 
 #include "Components/InputComponent.h"
 #include "Curves/CurveFloat.h"
-#include "FYP/Animation/SAnimCharacterBase.h"
 #include "FYP/Interface/PlayMontageInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -55,7 +54,7 @@ void ASCharacter::BasicAttack_Implementation()
 	IgnoredActor.Add(GetController()->GetPawn());
 	TArray<FHitResult> HitResults;
 	UKismetSystemLibrary::SphereTraceMulti(GetWorld(),CameraWorldLocation,CameraWorldLocation+(CameraForwardVector*1000),100,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResults,true);
-	StartYaw=Camera->GetComponentRotation().Yaw;
+	StartYaw=GetActorRotation().Yaw;
 	TargetYaw=Camera->GetComponentRotation().Yaw;
 	for(int i=0; i<HitResults.Num();i++)
 	{
