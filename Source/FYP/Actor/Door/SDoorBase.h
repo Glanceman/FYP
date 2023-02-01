@@ -18,6 +18,10 @@ public:
 	void Open(float DeltaTime);
 	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable,Category="Interaction")
 	void Close(float DeltaTime);
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	FName TriggerKeyName="Any";
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -14,6 +14,7 @@
 #include "SCharacter.generated.h"
 
 class ASKatanaBase;
+class USItemContainerComponent;
 UCLASS()
 class FYP_API ASCharacter : public ASCharacterBase, public ISAttackInterface
 {
@@ -47,7 +48,8 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bAttack=false;
-
+	UPROPERTY(BlueprintReadWrite)
+	USItemContainerComponent* SItemContainerComponent;
 
 protected:
 	// Called when the game starts or when spawned

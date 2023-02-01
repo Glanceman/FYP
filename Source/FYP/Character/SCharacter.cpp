@@ -6,6 +6,7 @@
 
 #include "Components/InputComponent.h"
 #include "Curves/CurveFloat.h"
+#include "FYP/Component/SItemContainerComponent.h"
 #include "FYP/Interface/PlayMontageInterface.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -25,7 +26,8 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw=false;
 	CameraBoom->bUsePawnControlRotation=true;
 	GetCharacterMovement()->bOrientRotationToMovement=true;
-	
+
+	SItemContainerComponent = CreateDefaultSubobject<USItemContainerComponent>("ItemContainerComponent");
 
 }
 
