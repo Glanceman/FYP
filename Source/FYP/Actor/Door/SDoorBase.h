@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FYP/Interface/SPuzzleTriggerInterface.h"
 #include "GameFramework/Actor.h"
 #include "SDoorBase.generated.h"
 
 UCLASS()
-class FYP_API ASDoorBase : public AActor
+class FYP_API ASDoorBase : public AActor, public ISPuzzleTriggerInterface
 {
 	GENERATED_BODY()
 	
