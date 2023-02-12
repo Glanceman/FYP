@@ -10,7 +10,7 @@
 ASEnemyBaseController::ASEnemyBaseController()
 {
 	AIPerceptionComponent=CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-	SightConfig=CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	// SightConfig=CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
 	
 }
 
@@ -39,20 +39,20 @@ void ASEnemyBaseController::BeginPlay()
 	}
 	RunBehaviorTree(SEnemyBase_BT);
 	
-	SightConfig->DetectionByAffiliation.bDetectEnemies=bCheckEnemy;
-	SightConfig->DetectionByAffiliation.bDetectFriendlies = bCheckFriend;
-	SightConfig->DetectionByAffiliation.bDetectNeutrals = bCheckNeutral;
-	SightConfig->SightRadius=SightRadius;
-	SightConfig->LoseSightRadius=LoseSightRadius;
-	SightConfig->PeripheralVisionAngleDegrees=PeripheralVisionAngleDegrees;
-	AIPerceptionComponent->ConfigureSense(*SightConfig);
-	AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
+	// SightConfig->DetectionByAffiliation.bDetectEnemies=bCheckEnemy;
+	// SightConfig->DetectionByAffiliation.bDetectFriendlies = bCheckFriend;
+	// SightConfig->DetectionByAffiliation.bDetectNeutrals = bCheckNeutral;
+	// SightConfig->SightRadius=SightRadius;
+	// SightConfig->LoseSightRadius=LoseSightRadius;
+	// SightConfig->PeripheralVisionAngleDegrees=PeripheralVisionAngleDegrees;
+	// AIPerceptionComponent->ConfigureSense(*SightConfig);
+	// AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this,&ASEnemyBaseController::OnPerception);
 
 	ASCharacterBase* ControlledCharacter=static_cast<ASCharacterBase*>(GetPawn());
 	if(ControlledCharacter)
 	{
-		TeamId=ControlledCharacter->ClassId;
+		TeamID=ControlledCharacter->TeamID;
 	}
 	
 	
@@ -60,9 +60,9 @@ void ASEnemyBaseController::BeginPlay()
 
 FGenericTeamId ASEnemyBaseController::GetGenericTeamId() const
 {
-	return TeamId;
+	return TeamID;
 }
-
+//
 ETeamAttitude::Type ASEnemyBaseController::GetTeamAttitudeTowards(const AActor& Other) const
 {
 	const ASCharacterBase* OtherCharacter= Cast<ASCharacterBase>(&Other);
@@ -70,18 +70,37 @@ ETeamAttitude::Type ASEnemyBaseController::GetTeamAttitudeTowards(const AActor& 
 	{
 		return ETeamAttitude::Neutral;	
 	}
-	//compare id vs ai controller id
-	if(OtherCharacter->GetGenericTeamId()==0)
+	
+	const IGenericTeamAgentInterface* IOtherCharacter = Cast<IGenericTeamAgentInterface>(OtherCharacter);
+	const IGenericTeamAgentInterface* IOtherController = Cast<IGenericTeamAgentInterface>(OtherCharacter->GetController());
+	if(IOtherCharacter==nullptr && IOtherController==nullptr)
 	{
 		return ETeamAttitude::Neutral;	
 	}
-	if(OtherCharacter->GetGenericTeamId()==TeamId)
+
+	FGenericTeamId OtherCharacterTeamID;
+	if(IOtherController)
 	{
-		return ETeamAttitude::Friendly;
-	}else
+		OtherCharacterTeamID=IOtherController->GetGenericTeamId();
+	}else if(IOtherCharacter)
 	{
-		return ETeamAttitude::Hostile;
+		OtherCharacterTeamID=IOtherCharacter->GetGenericTeamId();
 	}
+	
+	//compare id vs ai controller id
+	if(OtherCharacterTeamID==0)
+	{
+		return ETeamAttitude::Neutral;	
+	}
+	if(OtherCharacterTeamID!=TeamID)
+	{
+		return ETeamAttitude::Hostile;	
+	}
+	if(OtherCharacterTeamID==TeamID)
+	{
+		return ETeamAttitude::Friendly;	
+	}
+
 	return ETeamAttitude::Neutral;	
 }
 

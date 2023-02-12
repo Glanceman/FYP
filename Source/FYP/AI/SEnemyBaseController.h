@@ -21,8 +21,10 @@ public:
 	//virtual void OnPossess(APawn * InPawn) override;
 	virtual void BeginPlay() override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
-
+	
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere,Category="Setting")
+	FGenericTeamId TeamID;
 private:
 	UPROPERTY(EditAnywhere,Category="Setting")
 	UBehaviorTree* SEnemyBase_BT;
@@ -30,22 +32,20 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UAIPerceptionComponent* AIPerceptionComponent;
 
-	UPROPERTY(VisibleAnywhere)
-	UAISenseConfig_Sight* SightConfig;
+	// UPROPERTY(VisibleAnywhere)
+	// UAISenseConfig_Sight* SightConfig;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// float SightRadius=1000;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// float LoseSightRadius=2000;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// float PeripheralVisionAngleDegrees=60;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// bool bCheckEnemy=true;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// bool bCheckNeutral=true;
+	// UPROPERTY(EditDefaultsOnly,Category="SightConfig")
+	// bool bCheckFriend=true;
 
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	float SightRadius=1000;
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	float LoseSightRadius=2000;
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	float PeripheralVisionAngleDegrees=60;
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	bool bCheckEnemy=true;
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	bool bCheckNeutral=true;
-	UPROPERTY(EditDefaultsOnly,Category="SightConfig")
-	bool bCheckFriend=true;
-
-	FGenericTeamId TeamId;
 
 };

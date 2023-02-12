@@ -51,7 +51,7 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 FGenericTeamId ASCharacterBase::GetGenericTeamId() const
 {
-	return ClassId;
+	return TeamID;
 }
 
 

@@ -42,10 +42,10 @@ public:
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	FGenericTeamId TeamID=0;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
 	bool bDebug=true;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
-	FGenericTeamId ClassId=0;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
 	float BasicDamageValue = 1;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting", Meta= (Bitmask, BitmaskEnum="/Script/FYP.ECharacterState"))
