@@ -67,7 +67,8 @@ void ASKatanaBase::AttackDetectionEvent()
 		for(int i=0; i<Prev_TrackingPoints.Num();i++)
 		{
 			FHitResult HitResult;
-			if(UKismetSystemLibrary::SphereTraceSingle(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],10.0f,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResult,true))
+			EDrawDebugTrace::Type DrawBebugType = bDebug? EDrawDebugTrace::ForDuration :EDrawDebugTrace::None;
+			if(UKismetSystemLibrary::SphereTraceSingle(GetWorld(),Prev_TrackingPoints[i],Curr_TrackingPoints[i],10.0f,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,DrawBebugType,HitResult,true))
 			{
 				if(HitActors.Find(HitResult.GetActor())==nullptr)
 				{

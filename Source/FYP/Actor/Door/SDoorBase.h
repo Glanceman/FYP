@@ -21,11 +21,15 @@ public:
 	void Close(float DeltaTime);
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	FName TriggerKeyName="Any";
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	bool bAutoClose=true;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 
 

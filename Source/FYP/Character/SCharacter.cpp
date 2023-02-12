@@ -55,7 +55,8 @@ void ASCharacter::BasicAttack_Implementation()
 	TArray<AActor*>IgnoredActor;
 	IgnoredActor.Add(GetController()->GetPawn());
 	TArray<FHitResult> HitResults;
-	UKismetSystemLibrary::SphereTraceMulti(GetWorld(),CameraWorldLocation,CameraWorldLocation+(CameraForwardVector*1000),100,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,EDrawDebugTrace::ForDuration,HitResults,true);
+	EDrawDebugTrace::Type DrawBebugType = bDebug? EDrawDebugTrace::ForDuration :EDrawDebugTrace::None;
+	UKismetSystemLibrary::SphereTraceMulti(GetWorld(),CameraWorldLocation,CameraWorldLocation+(CameraForwardVector*1000),100,static_cast<ETraceTypeQuery>(ECollisionChannel::ECC_Visibility),false,IgnoredActor,DrawBebugType,HitResults,true);
 	StartYaw=GetActorRotation().Yaw;
 	TargetYaw=Camera->GetComponentRotation().Yaw;
 	for(int i=0; i<HitResults.Num();i++)
@@ -63,7 +64,10 @@ void ASCharacter::BasicAttack_Implementation()
 		AActor* HitActor= HitResults[i].GetActor();
 		if(Cast<ASCharacterBase>(HitActor))
 		{
-			DrawDebugSphere(GetWorld(),HitActor->GetActorLocation(),80.0f,10,FColor::Blue,true, -1, 0, 1);
+			if(bDebug)
+			{
+				DrawDebugSphere(GetWorld(),HitActor->GetActorLocation(),80.0f,10,FColor::Blue,true, -1, 0, 1);	
+			}
 			FRotator Rotation=UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),HitActor->GetActorLocation());
 			TargetYaw=Rotation.Yaw;
 			break;

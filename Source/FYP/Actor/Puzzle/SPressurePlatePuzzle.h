@@ -55,6 +55,8 @@ public:
 	TSet<FName> ExcludedPlate;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	FVector CheckGroundColliderSize{32,32,32};
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	AActor* TriggerableActor;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Debug Section")
 	int32 NumberOfChildActors=0;
 	

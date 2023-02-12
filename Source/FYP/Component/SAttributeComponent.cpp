@@ -9,7 +9,6 @@ USAttributeComponent::USAttributeComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-	Health=MaxHealth;
 	// ...
 }
 
@@ -18,7 +17,7 @@ USAttributeComponent::USAttributeComponent()
 void USAttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Health=MaxHealth;
 	// ...
 	
 }
@@ -34,6 +33,6 @@ void USAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 bool USAttributeComponent::ApplyHealthChange (float Delta)
 {
-	Health+=Delta;
+	Health = FMath::Clamp(Health+=Delta,0,MaxHealth);
 	return true;
 }

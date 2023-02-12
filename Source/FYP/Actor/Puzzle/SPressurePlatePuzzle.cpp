@@ -6,6 +6,7 @@
 #include "TimerManager.h"
 #include "Components/BoxComponent.h"
 #include "FYP/Character/SCharacter.h"
+#include "FYP/Interface/SPuzzleTriggerInterface.h"
 // Sets default values
 ASPressurePlatePuzzle::ASPressurePlatePuzzle()
 {
@@ -113,6 +114,13 @@ void ASPressurePlatePuzzle::Succeed()
 {
 	if(bDebug) UE_LOG(LogTemp, Warning, TEXT("Solved"));
 	bSolved=true;
+	if(IsValid(TriggerableActor) && Cast<ISPuzzleTriggerInterface>(TriggerableActor))
+	{
+		ISPuzzleTriggerInterface::Execute_TriggerToUnlock(TriggerableActor);
+	}else
+	{
+		if(bDebug) UE_LOG(LogTemp, Warning, TEXT("TriggerableActor is not valid"));
+	}
 }
 
 void ASPressurePlatePuzzle::Fail()

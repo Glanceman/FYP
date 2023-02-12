@@ -2,6 +2,8 @@
 
 
 #include "./SEnemyBase.h"
+#include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ASEnemyBase::ASEnemyBase()

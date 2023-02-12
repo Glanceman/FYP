@@ -3,6 +3,9 @@
 
 #include "./SDoorBase.h"
 
+#include "Engine/World.h"
+#include "FYP/Character/SCharacterBase.h"
+
 // Sets default values
 ASDoorBase::ASDoorBase()
 {
@@ -14,6 +17,15 @@ ASDoorBase::ASDoorBase()
 void ASDoorBase::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+}
+
+void ASDoorBase::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorEndOverlap(OtherActor);
+	if(Cast<ASCharacterBase>(OtherActor))
+	{
+		if(bAutoClose) Close(GetWorld()->GetDeltaSeconds());	
+	}
 }
 
 // Called when the game starts or when spawned

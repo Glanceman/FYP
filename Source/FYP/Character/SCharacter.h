@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "Components/TimelineComponent.h"
-#include "GenericTeamAgentInterface.h"
 #include "SCharacterBase.h"
 #include "Animation/AnimInstance.h"
 #include "FYP/Interface/SAttackInterface.h"
@@ -50,6 +49,14 @@ public:
 	bool bAttack=false;
 	UPROPERTY(BlueprintReadWrite)
 	USItemContainerComponent* SItemContainerComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	bool bAllowBasicMovement=true;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Character Setting")
+	float WalkMaxSpeed=500;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Character Setting")
+	float RunMaxSpeed=1000;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	bool bIsAttachWeapon =false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,7 +64,6 @@ protected:
 	//virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	UFUNCTION(BlueprintCallable)
 	virtual void BasicAttack_Implementation() override;
-
 
 private:
 	//functions
@@ -115,15 +121,7 @@ private:
 		bool bDashKeyHold=false;
 	
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
-		bool bAllowBasicMovement=true;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
-		float WalkMaxSpeed=500;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess=true),Category="Character Setting")
-		float RunMaxSpeed=1000;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
-		bool bIsAttachWeapon =false;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="Character Setting")
-		float DashTimeLength =0.5f;
+
+
 	
 };

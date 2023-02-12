@@ -26,6 +26,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CollectItem(FName ItemName);
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	TMap<FName,int32> ItemsName;
 };

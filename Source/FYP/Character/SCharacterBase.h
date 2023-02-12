@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GenericTeamAgentInterface.h"
+#include "FYP/Enum/ECharacterState.h"
 #include "SCharacterBase.generated.h"
 
 class USAttributeComponent;
@@ -22,6 +23,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable,Category="Character Setting")
+	FVector GetLastOnGroundLocation() const;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Character Setting");
+	FVector LastOnGroundLocation;
 
 	
 
@@ -35,12 +41,16 @@ public:
 
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
-
-
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	bool bDebug=true;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	FGenericTeamId ClassId=0;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	float BasicDamageValue = 1;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting", Meta= (Bitmask, BitmaskEnum="/Script/FYP.ECharacterState"))
+	uint8 CharacterState=static_cast<uint8>(ECharacterState::Alive);
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly);
 	USAttributeComponent* AttributeComponent;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
-	FGenericTeamId ClassId=0;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
-	float BasicDamageValue = 1;
+
 };

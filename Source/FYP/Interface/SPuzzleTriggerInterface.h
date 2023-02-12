@@ -21,7 +21,7 @@ class FYP_API ISPuzzleTriggerInterface
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="Puzzle")
-	void Unlock();
+	void TriggerToUnlock();
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 };
