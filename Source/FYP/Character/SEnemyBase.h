@@ -30,6 +30,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool CheckMontageIsPlaying(UAnimMontage* Montage) const;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	UAnimMontage* AM_BasicAttack=nullptr;
 };

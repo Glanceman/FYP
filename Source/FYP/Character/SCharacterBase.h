@@ -37,18 +37,20 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="SCharacter")
+	void Dead();
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="SCharacter")
+	void Revived();
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	FGenericTeamId TeamID=0;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	bool bDebug=true;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	float BasicDamageValue = 1;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting", Meta= (Bitmask, BitmaskEnum="/Script/FYP.ECharacterState"))
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting", Meta= (Bitmask, BitmaskEnum="/Script/FYP.ECharacterState"))
 	uint8 CharacterState=static_cast<uint8>(ECharacterState::Alive);
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly);
 	USAttributeComponent* AttributeComponent;

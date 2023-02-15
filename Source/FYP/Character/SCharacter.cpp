@@ -237,49 +237,75 @@ void ASCharacter::DashPressEvent()
 	DashCurveFloat->GetTimeRange(min,max);
 	float length = max - min; 
 	FOnTimelineFloatStatic DashTimeLineUpdateDelegate;
-	DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
-	DashTimeLine.AddInterpFloat(DashCurveFloat,DashTimeLineUpdateDelegate);
+	//DashTimeLineUpdateDelegate.BindUFunction(this,"UpdateDash");
+	//update function
+	DashTimeLine.AddInterpFloat(DashCurveFloat,FOnTimelineFloatStatic::CreateWeakLambda(this,[this,max](float val)
+	{
+		if(this->DashTimeLine.GetPlaybackPosition()<=max)
+		{
+			this->AddMovementInput(GetActorForwardVector());
+			const float CurveFloat = this->DashCurveFloat->GetFloatValue(this->DashTimeLine.GetPlaybackPosition());
+			const float FOV = FMath::Lerp(90,100,CurveFloat);
+			this->Camera->SetFieldOfView(FOV);	
+		}
+	}));
+	//finished function
 	FOnTimelineEventStatic DashTimeLineFinishedDelegate;
-	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
-	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
+	//DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
+	DashTimeLine.SetTimelineFinishedFunc(FOnTimelineEventStatic::CreateWeakLambda(this,[this]()
+	{
+		this->bIsDash=false;
+		const FVector CharacterCurrentAcceleration = this->GetCharacterMovement()->GetCurrentAcceleration();
+		if(this->bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
+		{
+			this->GetCharacterMovement()->MaxWalkSpeed=RunMaxSpeed;
+			this->bIsSprint=true;
+				
+		}else
+		{
+			this->bIsSprint=false;
+			this->GetCharacterMovement()->MaxWalkSpeed=WalkMaxSpeed;
+					
+		}
+		this->GetCharacterMovement()->MaxAcceleration=1000;
+	}));
 
 	DashTimeLine.SetTimelineLength(length+0.01f);
 	DashTimeLine.SetLooping(false);
-	
 	DashTimeLine.PlayFromStart();
 }
 
-void ASCharacter::UpdateDash()
-{
-	float min, max;
-	DashCurveFloat->GetTimeRange(min,max);
-	if(DashTimeLine.GetPlaybackPosition()<=max)
-	{
-		AddMovementInput(GetActorForwardVector());
-		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
-		const float FOV = FMath::Lerp(90,100,CurveFloat);
-		Camera->SetFieldOfView(FOV);	
-	}
-}
-
-void ASCharacter::Run()
-{
-	bIsDash=false;
-	const FVector CharacterCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
-	if(bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
-	{
-		GetCharacterMovement()->MaxWalkSpeed=RunMaxSpeed;
-		bIsSprint=true;
-		
-	}else
-	{
-		bIsSprint=false;
-		GetCharacterMovement()->MaxWalkSpeed=WalkMaxSpeed;
-			
-	}
-	GetCharacterMovement()->MaxAcceleration=1000;;
-	//UE_LOG(LogTemp,Warning,TEXT("Finish Called %f %b"),GetCharacterMovement()->GetCurrentAcceleration().Length(),bIsDash);
-}
+// void ASCharacter::UpdateDash()
+// {
+// 	float min, max;
+// 	DashCurveFloat->GetTimeRange(min,max);
+// 	if(DashTimeLine.GetPlaybackPosition()<=max)
+// 	{
+// 		AddMovementInput(GetActorForwardVector());
+// 		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
+// 		const float FOV = FMath::Lerp(90,100,CurveFloat);
+// 		Camera->SetFieldOfView(FOV);	
+// 	}
+// }
+//
+// void ASCharacter::Run()
+// {
+// 	bIsDash=false;
+// 	const FVector CharacterCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
+// 	if(bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
+// 	{
+// 		GetCharacterMovement()->MaxWalkSpeed=RunMaxSpeed;
+// 		bIsSprint=true;
+// 		
+// 	}else
+// 	{
+// 		bIsSprint=false;
+// 		GetCharacterMovement()->MaxWalkSpeed=WalkMaxSpeed;
+// 			
+// 	}
+// 	GetCharacterMovement()->MaxAcceleration=1000;
+// 	//UE_LOG(LogTemp,Warning,TEXT("Finish Called %f %b"),GetCharacterMovement()->GetCurrentAcceleration().Length(),bIsDash);
+// }
 
 void ASCharacter::DashReleaseEvent()
 {

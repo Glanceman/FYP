@@ -49,6 +49,14 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+void ASCharacterBase::Dead_Implementation()
+{
+}
+
+void ASCharacterBase::Revived_Implementation()
+{
+}
+
 FGenericTeamId ASCharacterBase::GetGenericTeamId() const
 {
 	return TeamID;

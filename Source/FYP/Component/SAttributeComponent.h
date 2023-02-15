@@ -27,7 +27,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	UFUNCTION(BlueprintCallable,Category="Attribute")
+	void Reset();
 	UFUNCTION(BlueprintCallable,Category="Attribute")
 	bool ApplyHealthChange (float Delta);
 		

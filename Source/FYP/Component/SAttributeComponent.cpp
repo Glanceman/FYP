@@ -31,6 +31,11 @@ void USAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
+void USAttributeComponent::Reset()
+{
+	Health=MaxHealth;
+}
+
 bool USAttributeComponent::ApplyHealthChange (float Delta)
 {
 	Health = FMath::Clamp(Health+=Delta,0,MaxHealth);

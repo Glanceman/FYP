@@ -49,13 +49,13 @@ public:
 	bool bAttack=false;
 	UPROPERTY(BlueprintReadWrite)
 	USItemContainerComponent* SItemContainerComponent;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	bool bAllowBasicMovement=true;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="SCharacter Setting")
 	float WalkMaxSpeed=500;
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="SCharacter Setting")
 	float RunMaxSpeed=1000;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character Setting")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SCharacter Setting")
 	bool bIsAttachWeapon =false;
 
 protected:
@@ -67,11 +67,12 @@ protected:
 
 private:
 	//functions
+	// UFUNCTION()
+	// 	void UpdateDash();
+	// UFUNCTION()
+	// 	void Run();
 	UFUNCTION()
-		void UpdateDash();
-	UFUNCTION()
-		void Run();
-		void DashReleaseEvent();
+	void DashReleaseEvent();
 	UFUNCTION()
 		void AttackRotate();
 	float StartYaw;;
