@@ -7,9 +7,11 @@
 #include "SBladeBase.h"
 #include "SKatanaBase.generated.h"
 
+class UAnimMontage;
 /**
  * 
  */
+
 UCLASS()
 class FYP_API ASKatanaBase : public ASWeaponBase
 {
@@ -38,21 +40,23 @@ protected:
 
 private:
 	UFUNCTION(BlueprintCallable)
-		TArray<FVector> GetTrackingPoints() const;
+	TArray<FVector> GetTrackingPoints() const;
 	UPROPERTY(VisibleAnywhere)
-		USceneComponent* Root;
+	USceneComponent* Root;
 	UPROPERTY(EditAnywhere,Category="Setting")
-		TSubclassOf<ASBladeBase> ProjectileBladeClass;
+	TSubclassOf<ASBladeBase> ProjectileBladeClass;
 	UPROPERTY()
-		TArray<FVector> Prev_TrackingPoints;
+	TArray<FVector> Prev_TrackingPoints;
 	UPROPERTY()
-		TArray<FVector> Curr_TrackingPoints;
+	TArray<FVector> Curr_TrackingPoints;
 	UPROPERTY()
-		FTimerHandle TimerHandle;
+	FTimerHandle TimerHandle;
+	UPROPERTY()
+	float TimerHandleSinceTriggerDuration=0;
 	UPROPERTY(EditAnywhere,Category="Debug Section")
-		bool bDebug=false;
+	bool bDebug=false;
 	UPROPERTY()
-		TSet<AActor*> HitActors;
+	TSet<AActor*> HitActors;
 	
 	
 };

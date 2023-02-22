@@ -3,25 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SPuzzleBase.h"
 #include "GameFramework/Actor.h"
 #include "SPressurePlatePuzzle.generated.h"
 
 class ASPressurePlate;
 class UBoxComponent;
 UCLASS()
-class FYP_API ASPressurePlatePuzzle : public AActor
+class FYP_API ASPressurePlatePuzzle : public ASPuzzleBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
 	ASPressurePlatePuzzle();
-	UFUNCTION()
-	virtual void Fail();
 	void AddNumberOfPressedPlates();
 	void MinusNumberOfPressedPlates();
-	UFUNCTION()
-	virtual void Succeed();
+	virtual void NotifyFromChildActor_Implementation(AActor* Child) override;
+	virtual void Fail_Implementation() override;
+	virtual void Succeed_Implementation() override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -47,10 +47,7 @@ public:
 	UBoxComponent* BoxComponent;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	USceneComponent* DefaultSceneRoot;
-	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
-	bool bDebug=true;
-	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
-	bool bSolved=false;
+
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	TSet<FName> ExcludedPlate;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")

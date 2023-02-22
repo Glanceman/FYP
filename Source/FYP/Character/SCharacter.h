@@ -67,14 +67,14 @@ protected:
 
 private:
 	//functions
-	// UFUNCTION()
-	// 	void UpdateDash();
-	// UFUNCTION()
-	// 	void Run();
+	UFUNCTION()
+	void UpdateDash();
+	UFUNCTION()
+	void Run();
 	UFUNCTION()
 	void DashReleaseEvent();
 	UFUNCTION()
-		void AttackRotate();
+	void AttackRotate();
 	float StartYaw;;
 	float TargetYaw;
 	//variables

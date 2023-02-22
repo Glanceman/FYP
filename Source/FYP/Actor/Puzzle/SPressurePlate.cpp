@@ -18,6 +18,7 @@ ASPressurePlate::ASPressurePlate()
 	Plate = CreateDefaultSubobject<UStaticMeshComponent>("Plate");
 	Plate -> SetupAttachment(BoxComponent);
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this,&ASPressurePlate::OnOverlapBegin);
+	BoxComponent->OnComponentEndOverlap.AddDynamic(this,&ASPressurePlate::OnEndOverlap);
 
 }
 
@@ -25,12 +26,8 @@ ASPressurePlate::ASPressurePlate()
 void ASPressurePlate::BeginPlay()
 {
 	Super::BeginPlay();
-	if(!IsValid(PuzzleClass))
-	{
-		if (bDebug) UE_LOG(LogTemp, Warning, TEXT("PuzzleClass is not set"));
-		return;
-	}
-	PuzzleParent = Cast<ASPressurePlatePuzzle>(GetParentActor());
+
+	PuzzleParent = Cast<ASPuzzleBase>(GetParentActor());
 	
 }
 
@@ -71,23 +68,47 @@ void ASPressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		return;
 	}
 	if(PuzzleParent->bSolved==true) return;
-	
-	if(Cast<ASCharacter>(OtherActor))
+	if (bDebug) UE_LOG(LogTemp, Warning, TEXT("Actor: %s"),*OtherActor->GetName());
+	if(OtherActor)
 	{
 		if(bOn==false)
 		{
-			bOn=true;
-			PuzzleParent->AddNumberOfPressedPlates();
+
+			//PuzzleParent->AddNumberOfPressedPlates();
 			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,TargetColor);
+			bOn=true;
+			PuzzleParent->NotifyFromChildActor(this);
 		}else
 		{
-			bOn=false;
-			PuzzleParent->MinusNumberOfPressedPlates();
+			//PuzzleParent->MinusNumberOfPressedPlates();
 			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			bOn=false;
+			PuzzleParent->NotifyFromChildActor(this);
 		}	
 	}
 }
 
+void ASPressurePlate::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if(bOnlyTriggerByEnter){return;}
+	if(PuzzleParent->bSolved==true) return;
+	if(OtherActor)
+	{
+		if(bOn==true)
+		{
+			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			bOn=false;
+			PuzzleParent->NotifyFromChildActor(this);
+		}	
+	}
+	
+}
+
+void ASPressurePlate::SetParentLater(AActor* Parent)
+{
+	PuzzleParent = Cast<ASPuzzleBase>(Parent);
+}
 
 
 // Called every frame

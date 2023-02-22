@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SPuzzleBase.h"
+
 #include "GameFramework/Actor.h"
+#include "Sound/SoundCue.h"
 #include "SPressurePlate.generated.h"
 
 class ASPressurePlatePuzzle;
@@ -26,6 +29,11 @@ protected:
 	void Reset() override;
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	UFUNCTION(BlueprintCallable,Category="SPressurePlate")
+	void SetParentLater(AActor* Parent);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -46,11 +54,14 @@ public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	bool bOn=false;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
-	TSubclassOf<ASPressurePlatePuzzle> PuzzleClass;
+	USoundCue* ReactCue=nullptr;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
-	ASPressurePlatePuzzle* PuzzleParent;
+	ASPuzzleBase* PuzzleParent;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	FVector ColliderSizeOffset{32,32,0};
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	bool bDebug=true;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	bool bOnlyTriggerByEnter=true;
+
 };

@@ -103,15 +103,22 @@ void ASPressurePlatePuzzle::NotifyActorEndOverlap(AActor* OtherActor)
 	}
 }
 
+
+
 void ASPressurePlatePuzzle::OnGroundColliderOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(bSolved){return;}
 	if(Cast<ASCharacter>(OtherActor)) Fail();
 }
 
-void ASPressurePlatePuzzle::Succeed()
+
+
+
+
+void ASPressurePlatePuzzle::Succeed_Implementation()
 {
+	Super::Succeed_Implementation();
 	if(bDebug) UE_LOG(LogTemp, Warning, TEXT("Solved"));
 	bSolved=true;
 	if(IsValid(TriggerableActor) && Cast<ISPuzzleTriggerInterface>(TriggerableActor))
@@ -123,8 +130,35 @@ void ASPressurePlatePuzzle::Succeed()
 	}
 }
 
-void ASPressurePlatePuzzle::Fail()
+void ASPressurePlatePuzzle::AddNumberOfPressedPlates()
 {
+	NumberOfPressed++;
+	if( NumberOfPlates == NumberOfPressed) Succeed();
+}
+void ASPressurePlatePuzzle::MinusNumberOfPressedPlates()
+{
+	NumberOfPressed--;
+	Fail();
+}
+
+void ASPressurePlatePuzzle::NotifyFromChildActor_Implementation(AActor* Child)
+{
+
+	Super::NotifyFromChildActor_Implementation(Child);
+	ASPressurePlate* Plate = Cast<ASPressurePlate>(Child);
+	if(Plate==nullptr){return ; }
+	if (Plate->bOn)
+	{
+		AddNumberOfPressedPlates();
+	}else
+	{
+		MinusNumberOfPressedPlates();
+	}
+}
+
+void ASPressurePlatePuzzle::Fail_Implementation()
+{
+	Super::Fail_Implementation();
 	if(bDebug) UE_LOG(LogTemp, Warning, TEXT("Fail"));
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle,FTimerDelegate::CreateLambda([this]
@@ -145,17 +179,6 @@ void ASPressurePlatePuzzle::Fail()
 		} 
 		
 	}),1,false);
-	
-}
-void ASPressurePlatePuzzle::AddNumberOfPressedPlates()
-{
-	NumberOfPressed++;
-	if( NumberOfPlates == NumberOfPressed) Succeed();
-}
-void ASPressurePlatePuzzle::MinusNumberOfPressedPlates()
-{
-	NumberOfPressed--;
-	Fail();
 }
 
 // Called every frame

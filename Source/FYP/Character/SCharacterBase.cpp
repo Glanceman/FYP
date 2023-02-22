@@ -21,8 +21,9 @@ void ASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle,FTimerDelegate::CreateLambda([this]
+	GetWorldTimerManager().SetTimer(UnusedHandle,FTimerDelegate::CreateWeakLambda(this,[this]
 	{
+		if(!IsValid(this)){return;}
 		if(!this->GetMovementComponent()->IsFalling())
 		{
 			LastOnGroundLocation=GetActorLocation();

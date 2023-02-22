@@ -56,10 +56,11 @@ TArray<FVector> ASKatanaBase::GetTrackingPoints() const
 
 void ASKatanaBase::AttackDetectionEvent()
 {
+	TimerHandleSinceTriggerDuration=0;
 	Prev_TrackingPoints=this->GetTrackingPoints();
 	HitActors.Empty();
 	//set up timer
-	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateLambda([this]()
+	GetWorldTimerManager().SetTimer(TimerHandle,FTimerDelegate::CreateWeakLambda(this,[this]()
 	{
 		Curr_TrackingPoints=this->GetTrackingPoints();
 		TArray<AActor*>IgnoredActor;
@@ -78,7 +79,14 @@ void ASKatanaBase::AttackDetectionEvent()
 				}
 			};
 		}
+		//self destroy
 		Prev_TrackingPoints=Curr_TrackingPoints;
+		TimerHandleSinceTriggerDuration+=GetWorldTimerManager().GetTimerElapsed(TimerHandle);
+		if(TimerHandleSinceTriggerDuration>=2)
+		{
+			StopDetectionEvent();
+		}
+		
 	}),0.01,true);
 }
 
