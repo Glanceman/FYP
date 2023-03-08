@@ -13,5 +13,14 @@ UCLASS()
 class FYP_API ASGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="GameMode")
+	void StartGame();
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="GameMode")
+	void PauseGame();
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="GameMode")
+	void BackToMain();
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable,Category="GameMode")
+    void Quit();
 	
 };

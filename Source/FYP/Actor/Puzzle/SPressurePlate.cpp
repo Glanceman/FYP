@@ -4,8 +4,11 @@
 
 #include "./SPressurePlate.h"
 #include "SPressurePlatePuzzle.h"
+#include "TimerManager.h"
 #include "Components/BoxComponent.h"
 #include "FYP/Character/SCharacter.h"
+#include "FYP/SLibrary/SToolLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
@@ -17,8 +20,9 @@ ASPressurePlate::ASPressurePlate()
 	RootComponent = BoxComponent;
 	Plate = CreateDefaultSubobject<UStaticMeshComponent>("Plate");
 	Plate -> SetupAttachment(BoxComponent);
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this,&ASPressurePlate::OnOverlapBegin);
-	BoxComponent->OnComponentEndOverlap.AddDynamic(this,&ASPressurePlate::OnEndOverlap);
+	BoxComponent->OnComponentBeginOverlap.AddUniqueDynamic(this,&ASPressurePlate::OnOverlapBegin);
+	BoxComponent->OnComponentEndOverlap.AddUniqueDynamic(this,&ASPressurePlate::OnEndOverlap);
+
 
 }
 
@@ -26,8 +30,11 @@ ASPressurePlate::ASPressurePlate()
 void ASPressurePlate::BeginPlay()
 {
 	Super::BeginPlay();
-
-	PuzzleParent = Cast<ASPuzzleBase>(GetParentActor());
+	
+	if(PuzzleParent==nullptr)
+	{//get parent which create this by child component actor 
+		PuzzleParent = Cast<ASPuzzleBase>(GetParentActor());
+	}
 	
 }
 
@@ -50,7 +57,8 @@ void ASPressurePlate::OnConstruction(const FTransform& Transform)
 		
 	}
 	Plate->SetMaterial(0,MaterialInstanceDynamic);
-	MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+	//MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+	USToolLibrary::ApplyMaterialParams(InitParams,MaterialInstanceDynamic);
 }
 
 void ASPressurePlate::Reset_Implementation()
@@ -62,7 +70,7 @@ void ASPressurePlate::Reset_Implementation()
 void ASPressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(!IsValid(PuzzleParent))
+	if(PuzzleParent==nullptr)
 	{
 		if (bDebug) UE_LOG(LogTemp, Warning, TEXT("PuzzleParent is not set"));
 		return;
@@ -73,15 +81,20 @@ void ASPressurePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	{
 		if(bOn==false)
 		{
-
-			//PuzzleParent->AddNumberOfPressedPlates();
-			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,TargetColor);
+			//play sound
+			if(IsValid(ReactCue))
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(),ReactCue,GetActorLocation(),GetActorRotation(),1,1,0);
+			}
+			//MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,TargetColor);
+			USToolLibrary::ApplyMaterialParams(TargetParams,MaterialInstanceDynamic);
 			bOn=true;
 			PuzzleParent->NotifyFromChildActor(this);
 		}else
 		{
 			//PuzzleParent->MinusNumberOfPressedPlates();
-			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			//MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			USToolLibrary::ApplyMaterialParams(InitParams,MaterialInstanceDynamic);
 			bOn=false;
 			PuzzleParent->NotifyFromChildActor(this);
 		}	
@@ -92,12 +105,18 @@ void ASPressurePlate::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if(bOnlyTriggerByEnter){return;}
+	if(!IsValid(PuzzleParent))
+	{
+		if (bDebug) UE_LOG(LogTemp, Warning, TEXT("PuzzleParent is not set"));
+		return;
+	}
 	if(PuzzleParent->bSolved==true) return;
 	if(OtherActor)
 	{
 		if(bOn==true)
 		{
-			MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			//MaterialInstanceDynamic->SetVectorParameterValue(MaterialSlotName,OriginalColor);
+			USToolLibrary::ApplyMaterialParams(InitParams,MaterialInstanceDynamic);
 			bOn=false;
 			PuzzleParent->NotifyFromChildActor(this);
 		}	
@@ -108,6 +127,11 @@ void ASPressurePlate::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 void ASPressurePlate::SetParentLater(AActor* Parent)
 {
 	PuzzleParent = Cast<ASPuzzleBase>(Parent);
+	if(IsValid(PuzzleParent)==false)
+	{
+		if (bDebug) UE_LOG(LogTemp, Warning, TEXT("Set PuzzleParent Later Fail"));
+	}
+
 }
 
 
@@ -117,4 +141,6 @@ void ASPressurePlate::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+
 

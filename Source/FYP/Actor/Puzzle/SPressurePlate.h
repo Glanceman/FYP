@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SPuzzleBase.h"
+#include "FYP/Enum/EMaterialParams.h"
 
 #include "GameFramework/Actor.h"
 #include "Sound/SoundCue.h"
@@ -37,6 +38,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	UStaticMeshComponent* Plate;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
@@ -50,7 +52,11 @@ public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	FLinearColor OriginalColor;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	TMap<EMaterialParams, FVector3f> InitParams;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	FLinearColor TargetColor;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
+	TMap<EMaterialParams, FVector3f> TargetParams;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")
 	bool bOn=false;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category="Setting")

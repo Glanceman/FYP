@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "PlayMontageInterface.generated.h"
-
+class UAnimMontage;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UPlayMontageInterface : public UInterface
