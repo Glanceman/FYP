@@ -3,7 +3,9 @@
 
 #include "SCharacter.h"
 #include "FYP/Actor/SKatanaBase.h"
-
+#include "InputMappingContext.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 #include "Components/InputComponent.h"
 #include "Curves/CurveFloat.h"
 #include "FYP/Component/SItemContainerComponent.h"
@@ -54,7 +56,7 @@ void ASCharacter::BeginPlay()
 	DashTimeLineFinishedDelegate.BindUFunction(this,"Run");
 	DashTimeLine.SetTimelineFinishedFunc(DashTimeLineFinishedDelegate);
 	DashTimeLine.SetLooping(false);
-	DashTimeLine.SetTimelineLength(length+0.01f);
+	DashTimeLine.SetTimelineLength(length+0.05f);
 
 	//set attackrotate timeline
 	AttackOrientationTimeLine.SetLooping(false);
@@ -122,52 +124,41 @@ void ASCharacter::Tick(float DeltaTime)
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Move Forward / Backward",this,&ASCharacter::MoveForwardEvent);
-	PlayerInputComponent->BindAxis("Move Right / Left",this,&ASCharacter::MoveRightEvent);
-	PlayerInputComponent->BindAxis("Turn Right / Left Mouse",this,&APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Look Up / Down Mouse",this,&APawn::AddControllerPitchInput);
 
-	PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ASCharacter::JumpEvent);
-	PlayerInputComponent->BindAction("EquipWeapon",EInputEvent::IE_Pressed,this,&ASCharacter::SwapAnimationClass);
+	// PlayerInputComponent->BindAxis("Turn Right / Left Mouse",this,&APawn::AddControllerYawInput);
+	// PlayerInputComponent->BindAxis("Look Up / Down Mouse",this,&APawn::AddControllerPitchInput);
+
+	// PlayerInputComponent->BindAction("Jump",EInputEvent::IE_Pressed,this,&ASCharacter::JumpEvent);
+	// PlayerInputComponent->BindAction("EquipWeapon",EInputEvent::IE_Pressed,this,&ASCharacter::SwapAnimationClass);
+	//
+	//PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashPressEvent);
+	//PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::DashReleaseEvent);
+
+	// Get the player controller
+	APlayerController* PC = Cast<APlayerController>(GetController());
+ 
+	// Get the local player subsystem
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	// Clear out existing mapping, and add our mapping
+	Subsystem->ClearAllMappings();
+	Subsystem->AddMappingContext(InputMappingContext.LoadSynchronous(), 0);
+
+	// Get the EnhancedInputComponent
+	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	// Bind the actions
+	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &ASCharacter::Move);
+	PEI->BindAction(InputActions->InputLook, ETriggerEvent::Triggered, this, &ASCharacter::Look);
+	PEI->BindAction(InputActions->InputJump, ETriggerEvent::Triggered, this, &ASCharacter::JumpEvent);
+	PEI->BindAction(InputActions->InputEquipWeapon, ETriggerEvent::Triggered, this, &ASCharacter::SwapAnimationClass);
+	PEI->BindAction(InputActions->InputRun, ETriggerEvent::Started, this, &ASCharacter::DashPressEvent);
+	PEI->BindAction(InputActions->InputRun, ETriggerEvent::Canceled, this, &ASCharacter::DashReleaseEvent);
+	PEI->BindAction(InputActions->InputRun, ETriggerEvent::Completed, this, &ASCharacter::DashReleaseEvent);
 	
-	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Pressed,this,&ASCharacter::DashPressEvent);
-	PlayerInputComponent->BindAction("Dash",EInputEvent::IE_Released,this,&ASCharacter::DashReleaseEvent);
-
 }
 
-void ASCharacter::MoveForwardEvent(float val)
-{
-	if(!bAllowBasicMovement)return;
-	
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
-	if(!MontageInterface){return;}
-	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
-	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
-	
-	FRotator ControlRot=GetControlRotation();
-	ControlRot.Pitch=0;
-	ControlRot.Roll=0;
-	AddMovementInput(ControlRot.Vector(),val);
-}
 
-void ASCharacter::MoveRightEvent(float val)
-{
-	if(!bAllowBasicMovement)return;
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
-	if(!MontageInterface){return;}
-	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
-	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
-	
-	FRotator ControlRot=GetControlRotation();
-	ControlRot.Pitch=0;
-	ControlRot.Roll=0;
 
-	const FVector ControlRightVec=UKismetMathLibrary::GetRightVector(ControlRot);
-	AddMovementInput(ControlRightVec,val);
-}
 void ASCharacter::JumpEvent()
 {
 	if(!bAllowBasicMovement)return;
@@ -180,6 +171,55 @@ void ASCharacter::JumpEvent()
 	
 	Jump();
 }
+
+void ASCharacter::Move(const FInputActionValue& InputActionValue)
+{
+	if(!bAllowBasicMovement)return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	IPlayMontageInterface* MontageInterface= Cast<IPlayMontageInterface>(AnimInstance);
+	if(!MontageInterface){return;}
+	bool Condition = bAttack==false && GetCharacterMovement()->GetCurrentAcceleration().Length()!=0;
+	IPlayMontageInterface::Execute_StopAttackMontage(AnimInstance,Condition,Weapon->AttackMontage);
+
+	if (Controller != nullptr)
+	{
+		const FVector2D MoveValue = InputActionValue.Get<FVector2D>();
+		const FRotator MovementRotation(0, Controller->GetControlRotation().Yaw, 0);
+ 
+		// Forward/Backward direction
+		if (MoveValue.Y != 0.f)
+		{
+			// Get forward vector
+			const FVector Direction = MovementRotation.RotateVector(FVector::ForwardVector);
+			AddMovementInput(Direction, MoveValue.Y);
+		}
+		// Right/Left direction
+		if (MoveValue.X != 0.f)
+		{
+			// Get right vector
+			const FVector Direction = MovementRotation.RotateVector(FVector::RightVector);
+			AddMovementInput(Direction, MoveValue.X);
+		}
+	}
+}
+void ASCharacter::Look(const FInputActionValue& InputActionValue)
+{
+	if (Controller != nullptr)
+	{
+		const FVector2D LookValue = InputActionValue.Get<FVector2D>();
+ 
+		if (LookValue.X != 0.f)
+		{
+			AddControllerYawInput(LookValue.X);
+		}
+ 
+		if (LookValue.Y != 0.f)
+		{
+			AddControllerPitchInput(LookValue.Y*-1.0);
+		}
+	}
+};
 
 ASKatanaBase* ASCharacter::GetWeapon() const
 {
@@ -251,7 +291,8 @@ void ASCharacter::UpdateDash()
 {
 	float min, max;
 	DashCurveFloat->GetTimeRange(min,max);
-	if(DashTimeLine.GetPlaybackPosition()<=max)
+	if(bDebug) UE_LOG(LogTemp,Warning,TEXT("Dashing"))
+	if(DashTimeLine.GetPlaybackPosition()<max)
 	{
 		AddMovementInput(GetActorForwardVector());
 		const float CurveFloat = DashCurveFloat->GetFloatValue(DashTimeLine.GetPlaybackPosition());
@@ -263,6 +304,7 @@ void ASCharacter::UpdateDash()
 void ASCharacter::Run()
 {
 	bIsDash=false;
+	if(bDebug) UE_LOG(LogTemp,Warning,TEXT("StartToRun"))
 	const FVector CharacterCurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
 	if(bDashKeyHold && !(CharacterCurrentAcceleration.Length()==0))
 	{

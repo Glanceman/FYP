@@ -7,9 +7,11 @@
 #include "Components/TimelineComponent.h"
 #include "SCharacterBase.h"
 #include "Animation/AnimInstance.h"
+#include "FYP/DataAsset/SheroInputConfigData.h"
 #include "FYP/Interface/SAttackInterface.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
+
 #include "SCharacter.generated.h"
 
 class ASKatanaBase;
@@ -25,13 +27,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void MoveRightEvent(float val);
+
 	void JumpEvent();
+	void Move(const FInputActionValue& InputActionValue);
+	void Look(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	//functions
-	void MoveForwardEvent(float val);
+	
 	void DashPressEvent();
 	void SwapAnimationClass();
 	UFUNCTION(BlueprintCallable)
@@ -65,6 +67,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void BasicAttack_Implementation() override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Enhanced Input")
+	TSoftObjectPtr< class UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+	USheroInputConfigData* InputActions;
+	
 private:
 	//functions
 	UFUNCTION()
@@ -121,7 +129,6 @@ private:
 	UPROPERTY()
 		bool bDashKeyHold=false;
 	
-
 
 
 	

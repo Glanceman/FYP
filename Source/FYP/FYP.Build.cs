@@ -8,7 +8,7 @@ public class FYP : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","GameplayTasks","UMG","NavigationSystem" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","GameplayTasks","UMG","NavigationSystem" ,"EnhancedInput"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
