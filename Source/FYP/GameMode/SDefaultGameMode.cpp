@@ -3,3 +3,6 @@
 
 #include "./SDefaultGameMode.h"
 
+void ASDefaultGameMode::Success_Implementation()
+{
+}
